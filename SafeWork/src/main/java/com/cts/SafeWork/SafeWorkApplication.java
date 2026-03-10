@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class SafeWorkApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(SafeWorkApplication.class, args);
 	}
 
