@@ -1,11 +1,11 @@
 package com.cts.SafeWork.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -13,15 +13,16 @@ import java.util.Date;
 @NoArgsConstructor
 public class EmployeeDocument {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long employeeDocumentID;
 
     private String employeeDocumentType;
     private String employeeFileURL;
-    private Date uploadedDate;
+    private LocalDate uploadedDate;
     private String verificationStatus;
 
     @ManyToOne
-    @JoinColumn(name = "employee_id", referencedColumnName = "employeeId")
+    @JoinColumn(name = "employee_id")
+    @JsonBackReference // Tells Jackson to STOP looping back to the Employee
     private Employee employee;
 }
