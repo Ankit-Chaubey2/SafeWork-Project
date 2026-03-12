@@ -23,13 +23,17 @@ public class User {
     private String userContact;
     private String userStatus;
 
-    public enum userRole {
+    private String password; // Hashed password
+
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole; // Role field
+
+    public enum UserRole {
         ADMIN,
         COMPLIANCE_OFFICER,
         SAFETY_OFFICER,
         EMPLOYEE
     }
-
 
     @OneToMany(mappedBy = "user")
     private List<UserAuditLog> userAuditLogs;
