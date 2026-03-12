@@ -21,4 +21,5 @@ public class ComplianceRecord {
     private String complianceResult;
     private Date complianceDate;
     private String complianceNotes;
+
 }
