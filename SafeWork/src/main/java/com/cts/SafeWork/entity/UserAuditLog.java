@@ -24,3 +24,4 @@ public class UserAuditLog {
     @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private User user;
 }
+

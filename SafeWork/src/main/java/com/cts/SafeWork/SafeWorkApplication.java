@@ -10,5 +10,4 @@ public class SafeWorkApplication {
 
 		SpringApplication.run(SafeWorkApplication.class, args);
 	}
-
 }
