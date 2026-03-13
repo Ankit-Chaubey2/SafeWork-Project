@@ -7,5 +7,4 @@ public interface IncidentReportProjection {
     long getIncidentId();
     String getAction();
     Date getIncidentDate();
-    String getIncidentStatus();
 }

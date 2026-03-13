@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface HazardRepository extends JpaRepository<Hazard,Long> {
 
@@ -18,4 +20,7 @@ public interface HazardRepository extends JpaRepository<Hazard,Long> {
                         "h.hazardStatus as hazardStatus "+
             " FROM Hazard h JOIN h.employee e")
      List<HazardReportProjection> getHazards();
+
+
+
 }

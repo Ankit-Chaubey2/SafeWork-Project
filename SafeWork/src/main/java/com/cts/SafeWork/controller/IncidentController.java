@@ -1,6 +1,7 @@
 package com.cts.SafeWork.controller;
 
 import com.cts.SafeWork.dto.IncidentRequestDto;
+import com.cts.SafeWork.entity.Incident;
 import com.cts.SafeWork.projection.IncidentReportProjection;
 import com.cts.SafeWork.repository.IncidentRepository;
 import com.cts.SafeWork.service.IIncidentService;
@@ -17,16 +18,19 @@ public class IncidentController {
     @Autowired
     private IIncidentService incidentService;
 
-    @PostMapping("/post")
-    public IncidentRequestDto addIncident(@RequestBody IncidentRequestDto request){
-        return incidentService.addIncident(request);
+    @PostMapping("/{hazardId}/{userId}/post")
+    public IncidentRequestDto addIncident(@PathVariable Long hazardId, @PathVariable Long userId, @RequestBody IncidentRequestDto request){
+        return incidentService.addIncident(hazardId, userId, request);
     }
 
-
-    @GetMapping("/get")
+    @GetMapping("/getAll")
     public List<IncidentReportProjection> getIncidents(){
         return incidentService.getIncidents();
     }
 
+    @GetMapping("/{incidentId}/getById")
+    public Incident getIncidentById(@PathVariable Long incidentId){
+        return incidentService.getIncidentById(incidentId);
+    }
 
 }
