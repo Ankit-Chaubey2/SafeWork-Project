@@ -15,7 +15,7 @@ import java.util.List;
 public class Inspection {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long inspectionId;
+    private Long inspectionId;
 
     private String inspectionLocation;
     private String inspectionFindings;
