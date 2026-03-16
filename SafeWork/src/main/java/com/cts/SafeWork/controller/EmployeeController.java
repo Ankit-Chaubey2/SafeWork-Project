@@ -1,6 +1,3 @@
-
-
-
 package com.cts.SafeWork.controller;
 
 import com.cts.SafeWork.entity.Employee;
@@ -10,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -54,4 +53,55 @@ public class EmployeeController {
             return ResponseEntity.notFound().build();
         }
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee details) {
+        try {
+            Employee updatedEmployee = employeeService.updateEmployee(id, details);
+            return ResponseEntity.ok(updatedEmployee);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+
+    @PostMapping("/logout/{id}")
+    public ResponseEntity<String> logout(@PathVariable Long id) {
+        // Yahan aap console par print kar sakte ho check karne ke liye
+        System.out.println("User with ID " + id + " is logging out...");
+
+        // Future mein yahan 'Last Login/Logout' time update kar sakte ho DB mein
+        return ResponseEntity.ok("Logout successful for Employee ID: " + id);
+    }
+
+
+    //to see the profile of employee on employee dashboard
+    @GetMapping("/{id}/stats")
+    public ResponseEntity<Map<String, Object>> getEmployeeStats(@PathVariable Long id) {
+        Optional<Employee> emp = employeeService.getEmployeeById(id);
+        if(emp.isPresent()) {
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("totalDocuments", emp.get().getDocuments().size());
+            stats.put("accountStatus", emp.get().getEmployeeStatus());
+            stats.put("department", emp.get().getEmployeeDepartmentName());
+            return ResponseEntity.ok(stats);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+
+
+    //change password logic
+    @PostMapping("/{id}/change-password")
+    public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody Map<String, String> passwords) {
+        String oldPassword = passwords.get("oldPassword");
+        String newPassword = passwords.get("newPassword");
+
+        boolean isChanged = employeeService.changePassword(id, oldPassword, newPassword);
+        if (isChanged) {
+            return ResponseEntity.ok("Password updated successfully!");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect!");
+        }
+    }
+
 }

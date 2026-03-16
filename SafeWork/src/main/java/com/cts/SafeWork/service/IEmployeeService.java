@@ -11,4 +11,8 @@ public interface IEmployeeService {
     Optional<Employee> loginEmployee(String email, String password);
 
     Optional<Employee> getEmployeeById(Long id);
+
+    Employee updateEmployee(Long id, Employee employeeDetails);
+
+    boolean changePassword(Long id, String oldPassword, String newPassword);
 }
