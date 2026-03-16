@@ -1,9 +1,11 @@
 package com.cts.SafeWork.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.mapping.ToOne;
 
 import java.util.Date;
 
@@ -18,13 +20,16 @@ public class Incident {
 
     private String action;
     private Date incidentDate;
-    private String incidentStatus;
+//    private String incidentStatus;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "hazard_id", referencedColumnName = "hazardId")
     private Hazard hazard;
 
     @ManyToOne
+    @JsonBackReference(value = "officer-incident")
     @JoinColumn(name = "officer_id", referencedColumnName = "userId")
     private User officer;
+
+
 }

@@ -23,6 +23,7 @@ public class EmployeeDocument {
 
     @ManyToOne
     @JoinColumn(name = "employee_id")
-    @JsonBackReference // Tells Jackson to STOP looping back to the Employee
+    //@JsonBackReference // Tells Jackson to STOP looping back to the Employee
+    @JsonBackReference("doc-employees")
     private Employee employee;
 }
