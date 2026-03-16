@@ -1,10 +1,13 @@
 package com.cts.SafeWork.entity;
 
+import com.cts.SafeWork.enums.ComplianceEntityType;
+import com.cts.SafeWork.enums.ComplianceResult;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -14,11 +17,14 @@ import java.util.Date;
 public class ComplianceRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long complianceId;
+    private Long complianceId;
 
     private long entityId;   // Generic reference
-    private String entityType;
-    private String complianceResult;
-    private Date complianceDate;
+    @Enumerated(EnumType.STRING)
+    private ComplianceEntityType entityType;
+    @Enumerated(EnumType.STRING)
+    private ComplianceResult complianceResult;
+    private LocalDate complianceDate;
     private String complianceNotes;
+
 }
