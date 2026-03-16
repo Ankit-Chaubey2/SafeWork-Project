@@ -28,11 +28,11 @@ public class Hazard {
 
     @ManyToOne
     @JoinColumn(name = "employee_id", referencedColumnName = "employeeId")
-    @JsonBackReference
+    @JsonBackReference(value = "hazard-employees")
     private Employee employee;
 
 //  @OneToMany(mappedBy = "hazard")
     @OneToOne(mappedBy = "hazard")
-    @JsonBackReference
+    @JsonBackReference(value = "hazard-incident")
     private Incident incidents;
 }

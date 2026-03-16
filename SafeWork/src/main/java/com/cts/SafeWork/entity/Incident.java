@@ -23,12 +23,11 @@ public class Incident {
 //    private String incidentStatus;
 
     @OneToOne
-    @JsonBackReference
     @JoinColumn(name = "hazard_id", referencedColumnName = "hazardId")
     private Hazard hazard;
 
     @ManyToOne
-    @JsonBackReference
+    @JsonBackReference(value = "officer-incident")
     @JoinColumn(name = "officer_id", referencedColumnName = "userId")
     private User officer;
 
