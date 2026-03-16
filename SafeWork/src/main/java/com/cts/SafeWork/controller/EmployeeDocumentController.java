@@ -1,6 +1,3 @@
-
-
-
 package com.cts.SafeWork.controller;
 
 import com.cts.SafeWork.entity.EmployeeDocument;
@@ -26,10 +23,12 @@ public class EmployeeDocumentController {
         return new ResponseEntity<>(savedDoc, HttpStatus.CREATED);
     }
 
+
     // 2. Get all documents for a specific Employee
     @GetMapping("/employee/{empId}")
     public ResponseEntity<List<EmployeeDocument>> getByEmployee(@PathVariable long empId) {
         List<EmployeeDocument> documents = documentService.getDocumentsByEmployee(empId);
         return ResponseEntity.ok(documents);
     }
+
 }
