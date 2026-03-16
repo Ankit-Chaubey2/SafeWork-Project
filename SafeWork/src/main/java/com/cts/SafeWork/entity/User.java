@@ -18,10 +18,22 @@ public class User {
     private long userId;
 
     private String userName;
-    private String userRole;
+
     private String userEmail;
     private String userContact;
     private String userStatus;
+
+    private String password; // Hashed password
+
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole; // Role field
+
+    public enum UserRole {
+        ADMIN,
+        COMPLIANCE_OFFICER,
+        SAFETY_OFFICER,
+        EMPLOYEE
+    }
 
     @OneToMany(mappedBy = "user")
     private List<UserAuditLog> userAuditLogs;
