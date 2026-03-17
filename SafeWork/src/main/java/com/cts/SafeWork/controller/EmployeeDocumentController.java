@@ -31,4 +31,14 @@ public class EmployeeDocumentController {
         return ResponseEntity.ok(documents);
     }
 
+<<<<<<< HEAD
+
+    // ... baaki imports ...
+    @GetMapping("/{docId}")
+    public ResponseEntity<EmployeeDocument> getById(@PathVariable Long docId) {
+        EmployeeDocument doc = documentService.getDocumentById(docId);
+        return ResponseEntity.ok(doc);
+    }
+=======
+>>>>>>> 2529641e69d16935200c3e051280181f73e728ee
 }
