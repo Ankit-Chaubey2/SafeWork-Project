@@ -33,4 +33,9 @@ public class IncidentController {
         return incidentService.getIncidentById(incidentId);
     }
 
+    @GetMapping("/getByHazard/{hazardId}")
+    public Incident getIncidentByHazardId(@PathVariable Long hazardId){
+        return incidentService.getIncidentByHazardId(hazardId);
+    }
+
 }
