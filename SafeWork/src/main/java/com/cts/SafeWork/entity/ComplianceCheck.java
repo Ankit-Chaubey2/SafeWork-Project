@@ -14,7 +14,7 @@ import java.util.Date;
 public class ComplianceCheck {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long checkId;
+    private Long checkId;
 
     private String complianceCheckResult;
     private String complianceCheckNotes;

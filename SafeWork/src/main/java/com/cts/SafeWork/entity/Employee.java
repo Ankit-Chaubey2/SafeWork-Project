@@ -35,14 +35,14 @@ public class Employee {
     private EmployeeStatus employeeStatus;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    @JsonManagedReference // Tells Jackson this is the "Parent"
+    @JsonManagedReference(value = "hazard-employees") // Tells Jackson this is the "Parent"
     private List<Hazard> hazards;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference(value = "training-employees")
     private List<Training> trainings;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
-    @JsonManagedReference
+    @JsonManagedReference(value = "doc-employees")
     private List<EmployeeDocument> documents;
 }

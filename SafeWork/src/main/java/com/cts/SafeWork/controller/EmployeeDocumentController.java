@@ -23,6 +23,7 @@ public class EmployeeDocumentController {
         return new ResponseEntity<>(savedDoc, HttpStatus.CREATED);
     }
 
+
     // 2. Get all documents for a specific Employee
     @GetMapping("/employee/{empId}")
     public ResponseEntity<List<EmployeeDocument>> getByEmployee(@PathVariable long empId) {
@@ -30,6 +31,7 @@ public class EmployeeDocumentController {
         return ResponseEntity.ok(documents);
     }
 
+<<<<<<< HEAD
 
     // ... baaki imports ...
     @GetMapping("/{docId}")
@@ -37,4 +39,6 @@ public class EmployeeDocumentController {
         EmployeeDocument doc = documentService.getDocumentById(docId);
         return ResponseEntity.ok(doc);
     }
+=======
+>>>>>>> 2529641e69d16935200c3e051280181f73e728ee
 }
