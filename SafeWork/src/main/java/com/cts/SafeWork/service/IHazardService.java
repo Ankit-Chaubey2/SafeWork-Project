@@ -13,4 +13,8 @@ public interface IHazardService  {
 
     Hazard getHazardById(Long hazardId);
 
+    String deleteHazard(Long hazardId);
+
+    HazardRequestDto updateHazard(Long hazardId, Long employeeId, HazardRequestDto hazardRequestDto);
+
 }

@@ -31,6 +31,15 @@ public class HazardController {
         return hazardService.getHazardById(hazardId);
     }
 
+    @DeleteMapping("/delete/{hazardId}")
+    public String deletehazard(@PathVariable Long hazardId){
+        return hazardService.deleteHazard(hazardId);
+    }
+
+    @PutMapping("/update/{hazardId}/{employeeId}")
+    public HazardRequestDto updateHazard(@PathVariable Long hazardId, @PathVariable Long employeeId, @RequestBody HazardRequestDto hazardRequestDto){
+        return hazardService.updateHazard(hazardId, employeeId, hazardRequestDto);
+    }
 
 }
 
