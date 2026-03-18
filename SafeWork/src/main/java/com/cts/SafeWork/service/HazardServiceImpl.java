@@ -4,6 +4,10 @@ import com.cts.SafeWork.dto.HazardRequestDto;
 import com.cts.SafeWork.entity.Employee;
 import com.cts.SafeWork.entity.Hazard;
 import com.cts.SafeWork.enums.HazardStatus;
+import com.cts.SafeWork.exception.EmployeeNotFoundException;
+import com.cts.SafeWork.exception.HazardNotFoundException;
+import com.cts.SafeWork.exception.IncidentAlreadyReportedException;
+import com.cts.SafeWork.exception.InvalidEmployeeException;
 import com.cts.SafeWork.projection.HazardReportProjection;
 import com.cts.SafeWork.repository.EmployeeRepository;
 import com.cts.SafeWork.repository.HazardRepository;
@@ -16,20 +20,22 @@ import java.util.List;
 @Service
 public class HazardServiceImpl implements IHazardService {
 
-    @Autowired
-    private HazardRepository hazardRepository;
+    private final HazardRepository hazardRepository;
+    private final EmployeeRepository employeeRepository;
 
-    @Autowired
-    private EmployeeRepository employeeRepository;
+    HazardServiceImpl(HazardRepository hazardRepository, EmployeeRepository employeeRepository) {
+        this.hazardRepository=hazardRepository;
+        this.employeeRepository=employeeRepository;
+    }
 
     @Override
-    public List<HazardReportProjection> getHazards() {
+    public final List<HazardReportProjection> getHazards() {
         return hazardRepository.getHazards();
     }
 
     @Override
     public Hazard getHazardById(Long hazardId) {
-        return hazardRepository.findById(hazardId).orElseThrow(()-> new RuntimeException("hazard id not found"));
+        return hazardRepository.findById(hazardId).orElseThrow(()-> new HazardNotFoundException(hazardId));
     }
 
     @Override
@@ -37,7 +43,7 @@ public class HazardServiceImpl implements IHazardService {
     public HazardRequestDto addHazard(Long employeeID, HazardRequestDto hazardRequestDto) {
         // 1) Ensure employee exists
         Employee employee = employeeRepository.findById(employeeID)
-                .orElseThrow(() -> new IllegalArgumentException("Employee not found with id: " + employeeID));
+                .orElseThrow(() -> new EmployeeNotFoundException(employeeID));
 
 
         // 2) Map DTO -> Entity (do not set hazardId it's auto-generated)
@@ -55,6 +61,38 @@ public class HazardServiceImpl implements IHazardService {
         hazardRequestDto.setHazardStatus(HazardStatus.PENDING);
 
         // 5) Return the same request DTO (or you can switch to a Response DTO with generated IDs)
+        return hazardRequestDto;
+    }
+
+    @Override
+    @Transactional
+    public String deleteHazard(Long hazardId) {
+        Hazard hazard = hazardRepository.findById(hazardId).orElseThrow(()-> new HazardNotFoundException(hazardId));
+
+        if(hazard.getHazardStatus()!=HazardStatus.PENDING){
+            throw new IncidentAlreadyReportedException("Hazard cannot be deleted because Incident has already been Reported");
+        }
+        hazardRepository.delete(hazard);
+        return "Hazard deleted successfully!";
+    }
+
+    @Override
+    @Transactional
+    public HazardRequestDto updateHazard(Long hazardId, Long employeeId, HazardRequestDto hazardRequestDto){
+        Hazard hazard = hazardRepository.findById(hazardId).orElseThrow(()-> new HazardNotFoundException(hazardId));
+        if(hazard.getHazardStatus()!=HazardStatus.PENDING){
+            throw new IncidentAlreadyReportedException("Hazard cannot be updated because Incident has already been Reported");
+        }
+
+        if(hazard.getEmployee().getEmployeeId()!=employeeId){
+            throw new InvalidEmployeeException();
+        }
+        hazard.setHazardDate(hazardRequestDto.getHazardDate());
+        hazard.setHazardDescription(hazardRequestDto.getHazardDescription());
+        hazard.setHazardLocation(hazardRequestDto.getHazardLocation());
+
+        hazardRepository.save(hazard);
+
         return hazardRequestDto;
     }
 }
