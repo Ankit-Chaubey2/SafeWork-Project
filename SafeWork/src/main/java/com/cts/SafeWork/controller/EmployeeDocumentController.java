@@ -1,7 +1,44 @@
+//package com.cts.SafeWork.controller;
+//
+//import com.cts.SafeWork.dto.DocumentRequestDTO;
+//import com.cts.SafeWork.dto.DocumentResponseDTO;
+//import com.cts.SafeWork.service.IEmployeeDocumentService;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.*;
+//
+//import java.util.List;
+//
+//@RestController
+//@RequestMapping("/api/documents")
+//public class EmployeeDocumentController {
+//
+//    @Autowired
+//    private IEmployeeDocumentService documentService;
+//
+//    @PostMapping("/upload")
+//    public ResponseEntity<DocumentResponseDTO> upload(@RequestBody DocumentRequestDTO dto) {
+//        return new ResponseEntity<>(documentService.uploadDocument(dto), HttpStatus.CREATED);
+//    }
+//
+//    @GetMapping("/employee/{empId}")
+//    public ResponseEntity<List<DocumentResponseDTO>> getByEmployee(@PathVariable long empId) {
+//        return ResponseEntity.ok(documentService.getDocumentsByEmployee(empId));
+//    }
+//
+//    @GetMapping("/{docId}")
+//    public ResponseEntity<DocumentResponseDTO> getById(@PathVariable Long docId) {
+//        return ResponseEntity.ok(documentService.getDocumentById(docId));
+//    }
+//}
+
 package com.cts.SafeWork.controller;
 
-import com.cts.SafeWork.entity.EmployeeDocument;
+import com.cts.SafeWork.dto.DocumentRequestDTO;
+import com.cts.SafeWork.dto.DocumentResponseDTO;
 import com.cts.SafeWork.service.IEmployeeDocumentService;
+import jakarta.validation.Valid; // Zaroori import
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,28 +53,19 @@ public class EmployeeDocumentController {
     @Autowired
     private IEmployeeDocumentService documentService;
 
-    // 1. Upload/Save Document metadata
+    // Added @Valid here to check DocumentRequestDTO
     @PostMapping("/upload")
-    public ResponseEntity<EmployeeDocument> upload(@RequestBody EmployeeDocument document) {
-        EmployeeDocument savedDoc = documentService.uploadDocument(document);
-        return new ResponseEntity<>(savedDoc, HttpStatus.CREATED);
+    public ResponseEntity<DocumentResponseDTO> upload(@Valid @RequestBody DocumentRequestDTO dto) {
+        return new ResponseEntity<>(documentService.uploadDocument(dto), HttpStatus.CREATED);
     }
 
-
-    // 2. Get all documents for a specific Employee
     @GetMapping("/employee/{empId}")
-    public ResponseEntity<List<EmployeeDocument>> getByEmployee(@PathVariable long empId) {
-        List<EmployeeDocument> documents = documentService.getDocumentsByEmployee(empId);
-        return ResponseEntity.ok(documents);
+    public ResponseEntity<List<DocumentResponseDTO>> getByEmployee(@PathVariable long empId) {
+        return ResponseEntity.ok(documentService.getDocumentsByEmployee(empId));
     }
 
-
-
-    // ... baaki imports ...
     @GetMapping("/{docId}")
-    public ResponseEntity<EmployeeDocument> getById(@PathVariable Long docId) {
-        EmployeeDocument doc = documentService.getDocumentById(docId);
-        return ResponseEntity.ok(doc);
+    public ResponseEntity<DocumentResponseDTO> getById(@PathVariable Long docId) {
+        return ResponseEntity.ok(documentService.getDocumentById(docId));
     }
-
 }

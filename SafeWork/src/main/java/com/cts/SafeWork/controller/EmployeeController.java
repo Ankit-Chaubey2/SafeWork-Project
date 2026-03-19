@@ -1,16 +1,99 @@
+//
+//
+//
+//package com.cts.SafeWork.controller;
+//
+//import com.cts.SafeWork.dto.EmployeeRegistrationDTO;
+//import com.cts.SafeWork.dto.EmployeeResponseDTO;
+//import com.cts.SafeWork.dto.LoginRequestDTO;
+//import com.cts.SafeWork.service.IEmployeeService;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.*;
+//
+//import java.util.HashMap;
+//import java.util.Map;
+//
+//@RestController
+//@RequestMapping("/employees")
+//public class EmployeeController {
+//
+//    @Autowired
+//    private IEmployeeService employeeService;
+//
+//    // 1. Register: pass the DTO
+//    @PostMapping("/register")
+//    public ResponseEntity<EmployeeResponseDTO> register(@RequestBody EmployeeRegistrationDTO registrationDTO) {
+//        return new ResponseEntity<>(employeeService.registerEmployee(registrationDTO), HttpStatus.CREATED);
+//    }
+//
+//    // 2. Login: used logic in service
+//    @PostMapping("/login")
+//    public ResponseEntity<EmployeeResponseDTO> login(@RequestBody LoginRequestDTO loginRequest) {
+//        return ResponseEntity.ok(employeeService.loginEmployee(loginRequest));
+//    }
+//
+//    // 3. Get Employee:
+//    @GetMapping("/{id}")
+//    public ResponseEntity<EmployeeResponseDTO> getEmployeeById(@PathVariable Long id) {
+//        return ResponseEntity.ok(employeeService.getEmployeeById(id));
+//    }
+//
+//    // 4. Update Employee:
+//    @PutMapping("/{id}")
+//    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id, @RequestBody EmployeeRegistrationDTO details) {
+//        return ResponseEntity.ok(employeeService.updateEmployee(id, details));
+//    }
+//
+//    // 5. Change Password
+//    @PostMapping("/{id}/change-password")
+//    public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody Map<String, String> passwords) {
+//        boolean isChanged = employeeService.changePassword(id, passwords.get("oldPassword"), passwords.get("newPassword"));
+//        if (isChanged) {
+//            return ResponseEntity.ok("Password updated successfully!");
+//        }
+//        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect old password!");
+//    }
+//
+//    @PostMapping("/logout/{id}")
+//    public ResponseEntity<String> logout(@PathVariable Long id) {
+//        return ResponseEntity.ok("Logout successful for Employee ID: " + id);
+//    }
+//
+//
+//
+//    @GetMapping("/{id}/stats")
+//    public ResponseEntity<Map<String, Object>> getEmployeeStats(@PathVariable Long id) {
+//
+//        //take dto from service and throw exception if id is wrong
+//        EmployeeResponseDTO emp = employeeService.getEmployeeById(id);
+//
+//        Map<String, Object> stats = new HashMap<>();
+//        stats.put("accountStatus", emp.getEmployeeStatus());
+//        stats.put("department", emp.getEmployeeDepartmentName());
+//
+//
+//        return ResponseEntity.ok(stats);
+//    }
+//}
+
+
+
 package com.cts.SafeWork.controller;
 
-import com.cts.SafeWork.entity.Employee;
+import com.cts.SafeWork.dto.EmployeeRegistrationDTO;
+import com.cts.SafeWork.dto.EmployeeResponseDTO;
+import com.cts.SafeWork.dto.LoginRequestDTO;
 import com.cts.SafeWork.service.IEmployeeService;
+import jakarta.validation.Valid; // Zaroori import
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/employees")
@@ -19,88 +102,49 @@ public class EmployeeController {
     @Autowired
     private IEmployeeService employeeService;
 
-    // 1. Registration Endpoint
+    // Added @Valid here
     @PostMapping("/register")
-    public ResponseEntity<Employee> register(@RequestBody Employee employee) {
-        Employee savedEmployee = employeeService.registerEmployee(employee);
-        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
+    public ResponseEntity<EmployeeResponseDTO> register(@Valid @RequestBody EmployeeRegistrationDTO registrationDTO) {
+        return new ResponseEntity<>(employeeService.registerEmployee(registrationDTO), HttpStatus.CREATED);
     }
 
-    // 2. Login Endpoint
+    // Login validation (Email/Password check)
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> loginRequest) {
-        String email = loginRequest.get("email");
-        String password = loginRequest.get("password");
-
-        Optional<Employee> employee = employeeService.loginEmployee(email, password);
-
-        if (employee.isPresent()) {
-            return ResponseEntity.ok(employee.get()); // Returns the full employee object on success
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
-        }
+    public ResponseEntity<EmployeeResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
+        return ResponseEntity.ok(employeeService.loginEmployee(loginRequest));
     }
 
-    // 3. Get Employee by ID
-    @GetMapping("/{employeeId}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long employeeId) {
-        Optional<Employee> employee = employeeService.getEmployeeById(employeeId);
-
-        if (employee.isPresent()) {
-            return ResponseEntity.ok(employee.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-    @PutMapping("/{id}") // EmployeeRegistrationDto
-    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee details) {
-        try {
-            Employee updatedEmployee = employeeService.updateEmployee(id, details);
-            return ResponseEntity.ok(updatedEmployee);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    @GetMapping("/{id}")
+    public ResponseEntity<EmployeeResponseDTO> getEmployeeById(@PathVariable Long id) {
+        return ResponseEntity.ok(employeeService.getEmployeeById(id));
     }
 
+    // Added @Valid here
+    @PutMapping("/{id}")
+    public ResponseEntity<EmployeeResponseDTO> updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeRegistrationDTO details) {
+        return ResponseEntity.ok(employeeService.updateEmployee(id, details));
+    }
+
+    @PostMapping("/{id}/change-password")
+    public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody Map<String, String> passwords) {
+        boolean isChanged = employeeService.changePassword(id, passwords.get("oldPassword"), passwords.get("newPassword"));
+        if (isChanged) {
+            return ResponseEntity.ok("Password updated successfully!");
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect old password!");
+    }
 
     @PostMapping("/logout/{id}")
     public ResponseEntity<String> logout(@PathVariable Long id) {
-        // Yahan aap console par print kar sakte ho check karne ke liye
-        System.out.println("User with ID " + id + " is logging out...");
-
-        // Future mein yahan 'Last Login/Logout' time update kar sakte ho DB mein
         return ResponseEntity.ok("Logout successful for Employee ID: " + id);
     }
 
-
-    //to see the profile of employee on employee dashboard
     @GetMapping("/{id}/stats")
     public ResponseEntity<Map<String, Object>> getEmployeeStats(@PathVariable Long id) {
-        Optional<Employee> emp = employeeService.getEmployeeById(id);
-        if(emp.isPresent()) {
-            Map<String, Object> stats = new HashMap<>();
-            stats.put("totalDocuments", emp.get().getDocuments().size());
-            stats.put("accountStatus", emp.get().getEmployeeStatus());
-            stats.put("department", emp.get().getEmployeeDepartmentName());
-            return ResponseEntity.ok(stats);
-        }
-        return ResponseEntity.notFound().build();
+        EmployeeResponseDTO emp = employeeService.getEmployeeById(id);
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("accountStatus", emp.getEmployeeStatus());
+        stats.put("department", emp.getEmployeeDepartmentName());
+        return ResponseEntity.ok(stats);
     }
-
-
-
-    //change password logic
-    @PatchMapping("/{id}/change-password")
-    public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody Map<String, String> passwords) {
-        String oldPassword = passwords.get("oldPassword");
-        String newPassword = passwords.get("newPassword");
-
-        boolean isChanged = employeeService.changePassword(id, oldPassword, newPassword);
-        if (isChanged) {
-            return ResponseEntity.ok("Password updated successfully!");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Old password is incorrect!");
-        }
-    }
-
 }

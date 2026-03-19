@@ -2,37 +2,33 @@ package com.cts.SafeWork.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
-
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Employee aur Document dono ke "Not Found" cases handle karega
+    // Handles 404 - Resource Not Found (Employee or Document)
     @ExceptionHandler({EmployeeNotFoundException.class, DocumentNotFoundException.class})
-    public ResponseEntity<?> handleNotFoundException(RuntimeException ex, WebRequest request) {
-        Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("timestamp", new Date());
-        errorDetails.put("message", ex.getMessage());
-        errorDetails.put("details", request.getDescription(false));
-        errorDetails.put("status", HttpStatus.NOT_FOUND.value());
-
-        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> handleNotFound(RuntimeException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
-    // 2. Generic Exception (Kuch bhi aur phata toh ye pakdega)
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
-        Map<String, Object> errorDetails = new HashMap<>();
-        errorDetails.put("timestamp", new Date());
-        errorDetails.put("message", "Internal Server Error: " + ex.getMessage()); // Debugging ke liye message rakha hai
-        errorDetails.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+    // Handles 400 - Validation Errors (e.g., Invalid Email or Empty Fields)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage()));
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
 
-        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    // Handles 500 - Any other unexpected server errors
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGlobal(Exception ex) {
+        return new ResponseEntity<>("Internal Error: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

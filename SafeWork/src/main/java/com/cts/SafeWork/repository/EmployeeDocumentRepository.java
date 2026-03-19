@@ -1,5 +1,3 @@
-
-
 package com.cts.SafeWork.repository;
 
 import com.cts.SafeWork.entity.EmployeeDocument;
@@ -9,6 +7,6 @@ import java.util.List;
 
 @Repository
 public interface EmployeeDocumentRepository extends JpaRepository<EmployeeDocument, Long> {
-    // Custom query to find docs by employee ID
+    // take documnet by empId
     List<EmployeeDocument> findByEmployee_EmployeeId(long employeeId);
 }
