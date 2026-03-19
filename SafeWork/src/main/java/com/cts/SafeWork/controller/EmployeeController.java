@@ -39,13 +39,12 @@ public class EmployeeController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
-
     }
 
     // 3. Get Employee by ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long id) {
-        Optional<Employee> employee = employeeService.getEmployeeById(id);
+    @GetMapping("/{employeeId}")
+    public ResponseEntity<Employee> getEmployeeById(@PathVariable Long employeeId) {
+        Optional<Employee> employee = employeeService.getEmployeeById(employeeId);
 
         if (employee.isPresent()) {
             return ResponseEntity.ok(employee.get());
@@ -53,7 +52,7 @@ public class EmployeeController {
             return ResponseEntity.notFound().build();
         }
     }
-    @PutMapping("/{id}")
+    @PutMapping("/{id}") // EmployeeRegistrationDto
     public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @RequestBody Employee details) {
         try {
             Employee updatedEmployee = employeeService.updateEmployee(id, details);
@@ -91,7 +90,7 @@ public class EmployeeController {
 
 
     //change password logic
-    @PostMapping("/{id}/change-password")
+    @PatchMapping("/{id}/change-password")
     public ResponseEntity<String> changePassword(@PathVariable Long id, @RequestBody Map<String, String> passwords) {
         String oldPassword = passwords.get("oldPassword");
         String newPassword = passwords.get("newPassword");

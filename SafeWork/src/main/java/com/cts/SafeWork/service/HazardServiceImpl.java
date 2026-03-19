@@ -29,8 +29,8 @@ public class HazardServiceImpl implements IHazardService {
     }
 
     @Override
-    public final List<HazardReportProjection> getHazards() {
-        return hazardRepository.getHazards();
+    public List<HazardReportProjection> getAllHazards() {
+        return hazardRepository.getAllHazards();
     }
 
     @Override

@@ -101,7 +101,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
         // findById khud Optional deta hai, orElseThrow use tabhi karo jab aapko direct Employee chahiye ho.
         // Lekin humein Optional return karna hai, toh hum aise likhenge:
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
         return Optional.of(employee);
     }
 
@@ -115,14 +115,14 @@ public class EmployeeServiceImpl implements IEmployeeService {
             employee.setEmployeeDepartmentName(details.getEmployeeDepartmentName());
             employee.setEmployeeStatus(details.getEmployeeStatus());
             return employeeRepository.save(employee);
-        }).orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
+        }).orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
     // 3. Updated: Change Password (Yahan bhi hum Exception throw kar sakte hain)
     @Override
     public boolean changePassword(Long id, String oldPassword, String newPassword) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
 
         if (passwordEncoder.matches(oldPassword, employee.getPassword())) {
             employee.setPassword(passwordEncoder.encode(newPassword));
