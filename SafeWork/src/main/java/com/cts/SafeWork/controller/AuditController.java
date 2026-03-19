@@ -3,63 +3,82 @@ package com.cts.SafeWork.controller;
 import com.cts.SafeWork.entity.Audit;
 import com.cts.SafeWork.enums.AuditScope;
 import com.cts.SafeWork.enums.AuditStatus;
+import com.cts.SafeWork.projection.AuditByIdProjection;
 import com.cts.SafeWork.service.IAuditService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/audit") // all should be inside ResponseEntity with status code + body
+@RequestMapping("/audit")
 public class AuditController {
 
+
+    private final IAuditService auditService;
+
     @Autowired
-    private IAuditService auditService;
-
-
-    @PostMapping("/createAudit") // user response in string
-    public void createAudit(@RequestBody Audit audit) {
-        auditService.createAudit(audit);
+    public AuditController(IAuditService auditService) {
+        this.auditService = auditService;
     }
 
-    //error
+
+    @PostMapping("/createAudit")
+    public ResponseEntity<String> createAudit(@RequestBody Audit audit) {
+        auditService.createAudit(audit);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Audit created successfully");
+    }
+
+
+    @PutMapping("/updateAudit/{auditId}")
+    public ResponseEntity<Audit> updateAudit(
+            @PathVariable Long auditId,
+            @RequestBody Audit updatedAudit) {
+        Audit audit = auditService.updateAudit(auditId, updatedAudit);
+        if (audit == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        return ResponseEntity.ok(audit);
+    }
+
     @GetMapping("/getAllAudits")
-    public List<Audit> getAllAudits() {
-        return auditService.getAllAudits();
+    public ResponseEntity<List<Audit>> getAllAudits() {
+        List<Audit> audits = auditService.getAllAudits();
+        return ResponseEntity.ok(audits);
     }
 
     @GetMapping("/getAuditById/{auditId}")
-    public Audit getAuditById(@PathVariable Long auditId) { // wrap inside AuditByIdProjection
-        return auditService.getAuditById(auditId).
-                orElseThrow(() -> new RuntimeException("Record not found with auditId:" + auditId)); // exception should be inside service
+    public ResponseEntity<AuditByIdProjection> getAuditById(@PathVariable Long auditId) {
+        return auditService.getAuditById(auditId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
-
-    @PutMapping("updateAudit/{auditId}") // wrap inside AuditUpdateProjection
-    public Audit updateAudit(@PathVariable Long auditId, @RequestBody Audit updatedAudit) {
-        return auditService.updateAudit(auditId, updatedAudit);
+    @GetMapping("/findByAuditStatus/{auditStatus}")
+    public ResponseEntity<List<Audit>> findByAuditStatus(@PathVariable AuditStatus auditStatus) {
+        List<Audit> audits = auditService.findByAuditStatus(auditStatus);
+        return ResponseEntity.ok(audits);
     }
 
-    @DeleteMapping("/deleteAudit/{auditId}") // user response in string
-    public void deleteAudit(@PathVariable Long auditId) {
+    @GetMapping("/findByAuditScope/{auditScope}")
+    public ResponseEntity<List<Audit>> findByAuditScope(@PathVariable AuditScope auditScope) {
+        List<Audit> audits = auditService.findByAuditScope(auditScope);
+        return ResponseEntity.ok(audits);
+    }
+
+    @GetMapping("/findAuditByOfficer_UserId/{userId}")
+    public ResponseEntity<List<Audit>> findAuditByOfficer_UserId(@PathVariable Long userId) {
+        List<Audit> audits = auditService.findAuditByOfficer_UserId(userId);
+        return ResponseEntity.ok(audits);
+    }
+
+    @DeleteMapping("/deleteAudit/{auditId}")
+    public ResponseEntity<String> deleteAudit(@PathVariable Long auditId) {
         auditService.deleteAudit(auditId);
+        return ResponseEntity.ok("Audit deleted successfully");
     }
-
-
-    @GetMapping("/findByAuditStatus/{auditStatus}") // wrap inside AuditStatusProjection
-    public List<Audit> findByAuditStatus(@PathVariable AuditStatus auditStatus) {
-        return auditService.findByAuditStatus(auditStatus);
-    }
-
-    @GetMapping("/findByAuditScope/{auditScope}") // // wrap inside AuditScopeProjection
-    public List<Audit> findByAuditScope(@PathVariable AuditScope auditScope) {
-        return auditService.findByAuditScope(auditScope);
-    }
-
-    @GetMapping("/findByOfficer_UserId/{userId}") //// wrap inside AuditOfficerByIdProjection
-    public List<Audit> findByOfficer_UserId(@PathVariable Long userId) {
-        return auditService.findByOfficer_UserId(userId);
-    }
-
-
 }

@@ -3,6 +3,7 @@ package com.cts.SafeWork.service;
 import com.cts.SafeWork.entity.Audit;
 import com.cts.SafeWork.enums.AuditScope;
 import com.cts.SafeWork.enums.AuditStatus;
+import com.cts.SafeWork.projection.AuditByIdProjection;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,7 @@ public interface IAuditService {
 
     List<Audit> getAllAudits();
 
-    Optional<Audit> getAuditById(Long id);
+    Optional<AuditByIdProjection> getAuditById(Long id);
 
     Audit updateAudit(Long id, Audit updatedAudit);
 
@@ -23,6 +24,6 @@ public interface IAuditService {
 
     List<Audit> findByAuditScope(AuditScope auditScope);
 
-    List<Audit> findByOfficer_UserId(Long userId);
+    List<Audit> findAuditByOfficer_UserId(Long userId);
 
 }
