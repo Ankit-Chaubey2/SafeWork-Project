@@ -19,7 +19,7 @@ public interface HazardRepository extends JpaRepository<Hazard,Long> {
                         "h.hazardDate as hazardDate, "+
                         "h.hazardStatus as hazardStatus "+
             " FROM Hazard h JOIN h.employee e")
-     List<HazardReportProjection> getHazards();
+     List<HazardReportProjection> getAllHazards();
 
 
 

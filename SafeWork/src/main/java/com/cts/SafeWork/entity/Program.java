@@ -1,5 +1,6 @@
 package com.cts.SafeWork.entity;
 
+import com.cts.SafeWork.enums.AuditScope;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,7 +28,7 @@ public class Program {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate programEndDate;     // manual entry, use ISO date format
     @Enumerated(EnumType.STRING)
-    private ProgramStatus programStatus;
+    private AuditScope.ProgramStatus programStatus;
 
     @JsonIgnore // Prevent infinite recursion
     @OneToMany(mappedBy = "program")

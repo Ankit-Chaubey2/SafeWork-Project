@@ -208,7 +208,7 @@ public class EmployeeServiceImpl implements IEmployeeService {
     @Override
     public boolean changePassword(Long id, String oldPassword, String newPassword) {
         Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with id: " + id));
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
 
         if (passwordEncoder.matches(oldPassword, employee.getPassword())) {
             employee.setPassword(passwordEncoder.encode(newPassword));

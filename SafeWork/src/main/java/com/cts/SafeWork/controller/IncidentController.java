@@ -7,6 +7,7 @@ import com.cts.SafeWork.repository.IncidentRepository;
 import com.cts.SafeWork.service.IIncidentService;
 import com.cts.SafeWork.service.IncidentServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,24 +19,24 @@ public class IncidentController {
     @Autowired
     private IIncidentService incidentService;
 
-    @PostMapping("/{hazardId}/{userId}/post")
-    public IncidentRequestDto addIncident(@PathVariable Long hazardId, @PathVariable Long userId, @RequestBody IncidentRequestDto request){
-        return incidentService.addIncident(hazardId, userId, request);
+    @PostMapping("/post/{hazardId}/{userId}")
+    public ResponseEntity<IncidentRequestDto> addIncident(@PathVariable Long hazardId, @PathVariable Long userId, @RequestBody IncidentRequestDto request){
+        return ResponseEntity.status(200).body(incidentService.addIncident(hazardId, userId, request));
     }
 
     @GetMapping("/getAll")
-    public List<IncidentReportProjection> getIncidents(){
-        return incidentService.getIncidents();
+    public ResponseEntity<List<IncidentReportProjection>> getIncidents(){
+        return ResponseEntity.status(200).body(incidentService.getIncidents());
     }
 
-    @GetMapping("/{incidentId}/getById")
-    public Incident getIncidentById(@PathVariable Long incidentId){
-        return incidentService.getIncidentById(incidentId);
+    @GetMapping("/getById/{incidentId}")
+    public ResponseEntity<Incident> getIncidentById(@PathVariable Long incidentId){
+        return ResponseEntity.status(200).body(incidentService.getIncidentById(incidentId));
     }
 
     @GetMapping("/getByHazard/{hazardId}")
-    public Incident getIncidentByHazardId(@PathVariable Long hazardId){
-        return incidentService.getIncidentByHazardId(hazardId);
+    public ResponseEntity<Incident> getIncidentByHazardId(@PathVariable Long hazardId){
+        return ResponseEntity.status(200).body(incidentService.getIncidentByHazardId(hazardId));
     }
 
 }
