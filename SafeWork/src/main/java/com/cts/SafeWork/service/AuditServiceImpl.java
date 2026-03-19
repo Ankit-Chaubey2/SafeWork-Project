@@ -3,6 +3,9 @@ package com.cts.SafeWork.service;
 import com.cts.SafeWork.entity.Audit;
 import com.cts.SafeWork.enums.AuditScope;
 import com.cts.SafeWork.enums.AuditStatus;
+import com.cts.SafeWork.exception.AuditNotFoundException;
+import com.cts.SafeWork.exception.NoAuditFoundException;
+import com.cts.SafeWork.projection.AuditByIdProjection;
 import com.cts.SafeWork.repository.AuditRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +16,12 @@ import java.util.Optional;
 @Service
 public class AuditServiceImpl implements IAuditService {
 
+    private final AuditRepository auditRepository;
+
     @Autowired
-    private AuditRepository auditRepository;
+    public AuditServiceImpl(AuditRepository auditRepository) {
+        this.auditRepository = auditRepository;
+    }
 
     @Override
     public void createAudit(Audit audit) {
@@ -23,12 +30,17 @@ public class AuditServiceImpl implements IAuditService {
 
     @Override
     public List<Audit> getAllAudits() {
-        return auditRepository.findAll();
+        List<Audit> audits = auditRepository.findAll();
+
+        if (audits.isEmpty()) {
+            throw new NoAuditFoundException("No audits found in the system");
+        }
+        return audits;
     }
 
     @Override
-    public Optional<Audit> getAuditById(Long id) {
-        return auditRepository.findById(id);
+    public Optional<AuditByIdProjection> getAuditById(Long id) {
+        return auditRepository.findProjectedByAuditId(id);
     }
 
     @Override
@@ -42,28 +54,56 @@ public class AuditServiceImpl implements IAuditService {
                     existing.setOfficer(updatedAudit.getOfficer());
                     return auditRepository.save(existing);
                 })
-                .orElseThrow(() -> new RuntimeException("Audit not found with id " + id));
+                .orElseThrow(() ->
+                        new AuditNotFoundException("Audit not found with id: " + id)
+                );
     }
 
     @Override
     public void deleteAudit(Long id) {
+        if (!auditRepository.existsById(id)) {
+            throw new AuditNotFoundException("Audit not found with id: " + id);
+        }
         auditRepository.deleteById(id);
     }
 
     @Override
     public List<Audit> findByAuditStatus(AuditStatus auditStatus) {
 
-        return auditRepository.findByAuditStatus(auditStatus);
+        List<Audit> audits = auditRepository.findByAuditStatus(auditStatus);
+
+        if (audits.isEmpty()) {
+            throw new NoAuditFoundException(
+                    "No audits found with status: " + auditStatus
+            );
+        }
+        return audits;
     }
 
     @Override
     public List<Audit> findByAuditScope(AuditScope auditScope) {
-        return auditRepository.findByAuditScope(auditScope);
+
+        List<Audit> audits = auditRepository.findByAuditScope(auditScope);
+
+        if (audits.isEmpty()) {
+            throw new NoAuditFoundException(
+                    "No audits found with scope: " + auditScope
+            );
+        }
+        return audits;
     }
+
 
     @Override
-    public List<Audit> findByOfficer_UserId(Long userId) {
-        return auditRepository.findByOfficer_UserId(userId);
-    }
+    public List<Audit> findAuditByOfficer_UserId(Long userId) {
 
+        List<Audit> audits = auditRepository.findAuditByOfficer_UserId(userId);
+
+        if (audits.isEmpty()) {
+            throw new NoAuditFoundException(
+                    "No audits found for officer with userId: " + userId
+            );
+        }
+        return audits;
+    }
 }
