@@ -2,14 +2,18 @@ package com.cts.SafeWork.controller;
 
 import com.cts.SafeWork.entity.Program;
 import com.cts.SafeWork.service.IProgramService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/programs")
+@Slf4j
 public class ProgramController {
 
     private final IProgramService service;
@@ -19,29 +23,43 @@ public class ProgramController {
         this.service = service;
     }
 
-    @GetMapping("/")
-    public List<Program> getAllPrograms() {
-        return service.getAllPrograms();
+    @GetMapping("/getallprograms")
+    public ResponseEntity<List<Program>> getAllPrograms() {
+        log.info("Received GET request: /programs/getallprograms");
+        return ResponseEntity.ok(service.getAllPrograms());
     }
 
-    @GetMapping("/{id}")
-    public Program getProgram(@PathVariable Long id) {
-        return service.getProgramById(id);
+    @GetMapping("/getprogrambyid/{id}")
+    public ResponseEntity<Program> getProgram(@PathVariable Long id) {
+        log.info("Received GET request for ID: {}", id);
+        return ResponseEntity.ok(service.getProgramById(id));
     }
 
-    @PostMapping
-    public Program createProgram(@RequestBody Program program) {
-        return service.createProgram(program);
+    @PostMapping("/create-program")
+    public ResponseEntity<Object> createProgram(@RequestBody Program program) {
+        log.info("Received POST request to create program: {}", program.getProgramTitle());
+        Program savedProgram = service.createProgram(program);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(Map.of(
+                        "message", "Program created successfully",
+                        "data", savedProgram
+                ));
     }
 
-    @PutMapping("/{id}")
-    public Program updateProgram(@PathVariable Long id, @RequestBody Program program) {
-        return service.updateProgram(id, program);
+    @PutMapping("/updateprogramwithid/{id}")
+    public ResponseEntity<Object> updateProgram(@PathVariable Long id, @RequestBody Program program) {
+        log.info("Received PUT request to update ID: {}", id);
+        Program updatedProgram = service.updateProgram(id, program);
+        return ResponseEntity.ok(Map.of(
+                "message", "Program ID " + id + " updated successfully",
+                "data", updatedProgram
+        ));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProgram(@PathVariable Long id) {
+    @DeleteMapping("/deleteprogrambyid/{id}")
+    public ResponseEntity<Object> deleteProgram(@PathVariable Long id) {
+        log.warn("Received DELETE request for ID: {}", id);
         service.deleteProgram(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(Map.of("message", "Program deleted successfully"));
     }
 }
