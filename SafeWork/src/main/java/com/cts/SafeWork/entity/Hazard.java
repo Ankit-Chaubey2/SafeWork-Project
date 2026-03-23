@@ -31,7 +31,6 @@ public class Hazard {
     @JsonBackReference(value = "hazard-employees")
     private Employee employee;
 
-//  @OneToMany(mappedBy = "hazard")
     @OneToOne(mappedBy = "hazard")
     @JsonBackReference(value = "hazard-incident")
     private Incident incidents;

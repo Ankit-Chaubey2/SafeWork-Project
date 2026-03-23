@@ -3,28 +3,40 @@ package com.cts.SafeWork.entity;
 import com.cts.SafeWork.enums.ComplianceEntityType;
 import com.cts.SafeWork.enums.ComplianceResult;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ComplianceRecord {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long complianceId;
 
-    private long entityId;   // Generic reference
+    @NotNull(message = "Entity ID must not be null")
+    @Positive(message = "Entity ID must be a positive number")
+    private Long entityId;
+
+    @NotNull(message = "Entity type is required")
     @Enumerated(EnumType.STRING)
     private ComplianceEntityType entityType;
+
+    @NotNull(message = "Compliance result is required")
     @Enumerated(EnumType.STRING)
     private ComplianceResult complianceResult;
-    private LocalDate complianceDate;
-    private String complianceNotes;
 
+    @NotNull(message = "Compliance date is required")
+    @PastOrPresent(message = "Compliance date cannot be in the future")
+    private LocalDate complianceDate;
+
+    @NotBlank(message = "Compliance notes must not be blank")
+    @Size(max = 500, message = "Compliance notes must not exceed 500 characters")
+    private String complianceNotes;
 }

@@ -62,6 +62,7 @@
 
 package com.cts.SafeWork.entity;
 
+import com.cts.SafeWork.enums.ComplianceEntityType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -88,7 +89,7 @@ public class Training {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate trainingCompletionDate;   // manual ISO date
     @Enumerated(EnumType.STRING)
-    private TrainingStatus trainingStatus;
+    private ComplianceEntityType.TrainingStatus trainingStatus;
 
     @JsonIgnore // Prevent infinite recursion
     @ManyToOne

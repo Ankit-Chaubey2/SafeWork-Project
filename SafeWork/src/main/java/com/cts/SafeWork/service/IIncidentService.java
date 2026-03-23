@@ -12,4 +12,6 @@ public interface IIncidentService {
     IncidentRequestDto addIncident(Long hazardId, Long userId, IncidentRequestDto incidentRequestDto);
 
     Incident getIncidentById(Long  incidentId);
+
+    Incident getIncidentByHazardId(Long hazardId);
 }

@@ -1,12 +1,11 @@
-
-
-
 package com.cts.SafeWork.service;
 
-import com.cts.SafeWork.entity.EmployeeDocument;
+import com.cts.SafeWork.dto.DocumentRequestDTO;
+import com.cts.SafeWork.dto.DocumentResponseDTO;
 import java.util.List;
 
 public interface IEmployeeDocumentService {
-    EmployeeDocument uploadDocument(EmployeeDocument document);
-    List<EmployeeDocument> getDocumentsByEmployee(long employeeId);
+    DocumentResponseDTO uploadDocument(DocumentRequestDTO dto);
+    List<DocumentResponseDTO> getDocumentsByEmployee(long employeeId);
+    DocumentResponseDTO getDocumentById(Long docId);
 }
