@@ -1,5 +1,6 @@
 package com.cts.SafeWork.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,8 +25,9 @@ public class Inspection {
 
     @ManyToOne
     @JoinColumn(name = "officer_id", referencedColumnName = "userId")
+    @JsonIgnoreProperties("inspections")
     private User officer;
 
-    @OneToMany(mappedBy = "inspection")
+    @OneToMany(mappedBy = "inspection",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ComplianceCheck> complianceChecks;
 }

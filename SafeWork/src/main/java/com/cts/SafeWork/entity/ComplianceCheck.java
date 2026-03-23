@@ -1,5 +1,7 @@
 package com.cts.SafeWork.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +24,7 @@ public class ComplianceCheck {
     private String complianceCheckStatus;
 
     @ManyToOne
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @JoinColumn(name = "inspection_id", referencedColumnName = "inspectionId")
     private Inspection inspection;
 }
