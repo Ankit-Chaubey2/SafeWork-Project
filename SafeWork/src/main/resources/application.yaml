@@ -3,9 +3,7 @@ server:
 
 logging:
   level:
-    # This silences the Hibernate startup/metadata logs
     org.hibernate: WARN
-    # This silences the connection pool logs
     org.hibernate.engine.jdbc.connections.internal.DriverManagerConnectionProviderImpl: WARN
 
 spring:
@@ -13,17 +11,25 @@ spring:
     name: ems
 
   datasource:
-    url: jdbc:mysql://localhost:3306/SafeWork
+    # Added createDatabaseIfNotExist just in case
+    url: jdbc:mysql://localhost:3306/SafeWork?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
-    # Ensure this is set to false if you want to hide SQL queries
     show-sql: true
     hibernate:
+      # CHANGED: 'create' will drop the old table and fix the 'employee_id' error.
+      # After you run it ONCE successfully, change this back to 'update'.
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: false
+
+# JWT config (Updated with a secure random string)
+app:
+  jwt:
+    secret: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
+    expirationMs: 86400000 # 1 day
