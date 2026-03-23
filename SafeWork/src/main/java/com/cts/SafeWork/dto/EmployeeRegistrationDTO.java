@@ -17,9 +17,7 @@ public class EmployeeRegistrationDTO {
     private String password;
     @NotBlank(message = "Name is mandatory")
     private String employeeName;
-
     private LocalDate employeeDOB;
-
     private String employeeGender;
     private String employeeAddress;
     @NotBlank(message = "Contact number is required")

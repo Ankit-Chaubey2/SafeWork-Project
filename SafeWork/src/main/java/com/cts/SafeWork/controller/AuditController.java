@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/audit")
 public class AuditController {
 
+
     private final IAuditService auditService;
 
     @Autowired
@@ -27,31 +28,39 @@ public class AuditController {
         this.auditService = auditService;
     }
 
-    @PostMapping("/createAudit")
-    public ResponseEntity<String> createAudit(@Valid @RequestBody Audit audit) {
-        log.info("Request received to create audit");
-        auditService.createAudit(audit);
-        log.info("Audit created successfully");
-        return ResponseEntity.status(HttpStatus.CREATED).body("Audit created successfully");
+    @Autowired
+    public AuditController(IAuditService auditService) {
+        this.auditService = auditService;
     }
 
+    @PostMapping("/createAudit")
+    public ResponseEntity<String> createAudit(@RequestBody Audit audit) {
+        auditService.createAudit(audit);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Audit created successfully");
+    }
+
+
     @PutMapping("/updateAudit/{auditId}")
-    public ResponseEntity<Audit> updateAudit(@PathVariable Long auditId,@Valid @RequestBody Audit updatedAudit) {
-        log.info("Updating audit with id {}", auditId);
+    public ResponseEntity<Audit> updateAudit(
+            @PathVariable Long auditId,
+            @RequestBody Audit updatedAudit) {
         Audit audit = auditService.updateAudit(auditId, updatedAudit);
-        log.info("Audit {} updated successfully", auditId);
+        if (audit == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
         return ResponseEntity.ok(audit);
     }
 
     @GetMapping("/getAllAudits")
     public ResponseEntity<List<Audit>> getAllAudits() {
-        log.info("Fetching all audits");
-        return ResponseEntity.ok(auditService.getAllAudits());
+        List<Audit> audits = auditService.getAllAudits();
+        return ResponseEntity.ok(audits);
     }
 
     @GetMapping("/getAuditById/{auditId}")
     public ResponseEntity<AuditByIdProjection> getAuditById(@PathVariable Long auditId) {
-        log.info("Fetching audit with id {}", auditId);
         return auditService.getAuditById(auditId)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -59,27 +68,25 @@ public class AuditController {
 
     @GetMapping("/findByAuditStatus/{auditStatus}")
     public ResponseEntity<List<Audit>> findByAuditStatus(@PathVariable AuditStatus auditStatus) {
-        log.info("Finding audits with status {}", auditStatus);
-        return ResponseEntity.ok(auditService.findByAuditStatus(auditStatus));
+        List<Audit> audits = auditService.findByAuditStatus(auditStatus);
+        return ResponseEntity.ok(audits);
     }
 
     @GetMapping("/findByAuditScope/{auditScope}")
     public ResponseEntity<List<Audit>> findByAuditScope(@PathVariable AuditScope auditScope) {
-        log.info("Finding audits with scope {}", auditScope);
-        return ResponseEntity.ok(auditService.findByAuditScope(auditScope));
+        List<Audit> audits = auditService.findByAuditScope(auditScope);
+        return ResponseEntity.ok(audits);
     }
 
     @GetMapping("/findAuditByOfficer_UserId/{userId}")
     public ResponseEntity<List<Audit>> findAuditByOfficer_UserId(@PathVariable Long userId) {
-        log.info("Finding audits for officer userId {}", userId);
-        return ResponseEntity.ok(auditService.findAuditByOfficer_UserId(userId));
+        List<Audit> audits = auditService.findAuditByOfficer_UserId(userId);
+        return ResponseEntity.ok(audits);
     }
 
     @DeleteMapping("/deleteAudit/{auditId}")
     public ResponseEntity<String> deleteAudit(@PathVariable Long auditId) {
-        log.warn("Deleting audit with id {}", auditId);
         auditService.deleteAudit(auditId);
-        log.info("Audit {} deleted", auditId);
         return ResponseEntity.ok("Audit deleted successfully");
     }
 }

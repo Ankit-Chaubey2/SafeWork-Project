@@ -22,7 +22,7 @@ import java.time.LocalDate;
 public class Audit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long auditId;
 
 

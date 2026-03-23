@@ -16,15 +16,15 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Handles 404 - Resource Not Found (Employee or Document)
     @ExceptionHandler({EmployeeNotFoundException.class, DocumentNotFoundException.class})
     public ResponseEntity<String> handleNotFound(RuntimeException ex) {
-        log.error("Resource not found: {}", ex.getMessage());
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    // Handles 400 - Validation Errors (e.g., Invalid Email or Empty Fields)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException ex) {
-        log.warn("Validation failed");
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage()));
@@ -33,30 +33,44 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AuditNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleAuditNotFound(AuditNotFoundException ex) {
-        log.error("Audit not found: {}", ex.getMessage());
+
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.NOT_FOUND.value());
         response.put("error", "Audit Not Found");
         response.put("message", ex.getMessage());
+
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(NoAuditFoundException.class)
     public ResponseEntity<Map<String, Object>> handleNoAuditFound(NoAuditFoundException ex) {
-        log.warn("No audits found: {}", ex.getMessage());
+
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.NOT_FOUND.value());
         response.put("error", "No Data Found");
         response.put("message", ex.getMessage());
+
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Object> handleResourceNotFound(ResourceNotFoundException ex) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.NOT_FOUND.value());
+        response.put("error", "Not Found");
+        response.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    // Handles 500 - Any other unexpected server errors
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGlobal(Exception ex) {
-        log.error("Internal server error: {}", ex.getMessage(), ex);
-        return new ResponseEntity<>("Internal Error: " + ex.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>("Internal Error: " + ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -26,11 +26,10 @@ public class ComplianceRecordController {
         this.complianceRecordService = complianceRecordService;
     }
 
+
     @PostMapping("/createComplianceRecord")
-    public ResponseEntity<String> createComplianceRecord(@Valid @RequestBody ComplianceRecord complianceRecord) {
-        log.info("Request received to create ComplianceRecord");
+    public ResponseEntity<String> createComplianceRecord(@RequestBody ComplianceRecord complianceRecord) {
         complianceRecordService.createComplianceRecord(complianceRecord);
-        log.info("ComplianceRecord created successfully");
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Compliance Record created successfully");
     }
@@ -38,46 +37,44 @@ public class ComplianceRecordController {
     @PutMapping("/updateComplianceRecord/{complianceId}")
     public ResponseEntity<String> updateComplianceRecord(
             @PathVariable Long complianceId,
-            @Valid @RequestBody ComplianceRecord updatedRecord) {
+            @RequestBody ComplianceRecord updatedRecord) {
 
-        log.info("Request received to update ComplianceRecord with ID {}", complianceId);
         complianceRecordService.updateComplianceRecord(complianceId, updatedRecord);
-        log.info("ComplianceRecord {} updated successfully", complianceId);
         return ResponseEntity.ok("Compliance Record updated successfully");
     }
 
+
     @DeleteMapping("/deleteComplianceRecord/{complianceId}")
     public ResponseEntity<String> deleteComplianceRecord(@PathVariable Long complianceId) {
-        log.warn("Request received to delete ComplianceRecord with ID {}", complianceId);
         complianceRecordService.deleteComplianceRecord(complianceId);
-        log.info("ComplianceRecord {} deleted successfully", complianceId);
         return ResponseEntity.ok("Compliance Record deleted successfully");
     }
 
     @GetMapping("/getAllComplianceRecord")
     public ResponseEntity<List<ComplianceRecord>> getAllComplianceRecords() {
-        log.info("Request received to fetch all ComplianceRecords");
         List<ComplianceRecord> records = complianceRecordService.getAllComplianceRecords();
-        log.info("Fetched {} ComplianceRecords", records.size());
         return ResponseEntity.ok(records);
     }
 
+
     @GetMapping("/getComplianceRecordById/{complianceId}")
     public ResponseEntity<?> getComplianceRecordById(@PathVariable Long complianceId) {
-        log.info("Request received to fetch ComplianceRecord with ID {}", complianceId);
-
         Optional<ComplianceRecord> recordOpt =
                 complianceRecordService.getComplianceRecordById(complianceId);
 
-        log.info("ComplianceRecord {} found", complianceId);
-        return ResponseEntity.ok(recordOpt.get());
+        if (recordOpt.isPresent()) {
+            return ResponseEntity.ok(recordOpt.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Record not found with complianceId: " + complianceId);
+        }
     }
+
 
     @GetMapping("/ComplianceEntityType/{entityType}")
     public ResponseEntity<List<ComplianceRecord>> findByEntityType(
             @PathVariable ComplianceEntityType entityType) {
 
-        log.info("Request received to fetch ComplianceRecords by EntityType {}", entityType);
         return ResponseEntity.ok(complianceRecordService.findByEntityType(entityType));
     }
 
@@ -85,7 +82,10 @@ public class ComplianceRecordController {
     public ResponseEntity<List<ComplianceRecord>> findByComplianceResult(
             @PathVariable ComplianceResult complianceResult) {
 
-        log.info("Request received to fetch ComplianceRecords by Result {}", complianceResult);
+    @GetMapping("/findByComplianceResult/{complianceResult}")
+    public ResponseEntity<List<ComplianceRecord>> findByComplianceResult(
+            @PathVariable ComplianceResult complianceResult) {
+
         return ResponseEntity.ok(complianceRecordService.findByComplianceResult(complianceResult));
     }
 }

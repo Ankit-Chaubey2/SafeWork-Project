@@ -32,11 +32,9 @@ public class ComplianceRecordServiceImpl implements IComplianceRecordService {
 
     @Override
     public List<ComplianceRecord> getAllComplianceRecords() {
-        log.info("Fetching all ComplianceRecords from database");
         List<ComplianceRecord> records = complianceRecordRepository.findAll();
 
         if (records.isEmpty()) {
-            log.warn("No ComplianceRecords found");
             throw new ResourceNotFoundException("No compliance records found");
         }
 
@@ -45,12 +43,9 @@ public class ComplianceRecordServiceImpl implements IComplianceRecordService {
 
     @Override
     public Optional<ComplianceRecord> getComplianceRecordById(Long id) {
-        log.info("Fetching ComplianceRecord with ID {}", id);
-
         Optional<ComplianceRecord> record = complianceRecordRepository.findById(id);
 
         if (record.isEmpty()) {
-            log.error("ComplianceRecord not found with ID {}", id);
             throw new ResourceNotFoundException("ComplianceRecord not found with id " + id);
         }
 
@@ -59,14 +54,9 @@ public class ComplianceRecordServiceImpl implements IComplianceRecordService {
 
     @Override
     public void updateComplianceRecord(Long id, ComplianceRecord updatedRecord) {
-        log.info("Updating ComplianceRecord with ID {}", id);
-
         ComplianceRecord existing = complianceRecordRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.error("ComplianceRecord not found with ID {}", id);
-                    return new ResourceNotFoundException(
-                            "ComplianceRecord not found with id " + id);
-                });
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("ComplianceRecord not found with id " + id));
 
         existing.setEntityId(updatedRecord.getEntityId());
         existing.setEntityType(updatedRecord.getEntityType());
@@ -75,34 +65,23 @@ public class ComplianceRecordServiceImpl implements IComplianceRecordService {
         existing.setComplianceNotes(updatedRecord.getComplianceNotes());
 
         complianceRecordRepository.save(existing);
-        log.info("ComplianceRecord {} updated successfully", id);
     }
 
     @Override
     public void deleteComplianceRecord(Long id) {
-        log.warn("Deleting ComplianceRecord with ID {}", id);
-
         if (!complianceRecordRepository.existsById(id)) {
-            log.error("ComplianceRecord not found with ID {}", id);
-            throw new ResourceNotFoundException(
-                    "ComplianceRecord not found with id " + id);
+            throw new ResourceNotFoundException("ComplianceRecord not found with id " + id);
         }
-
         complianceRecordRepository.deleteById(id);
         log.info("ComplianceRecord {} deleted successfully", id);
     }
 
     @Override
     public List<ComplianceRecord> findByEntityType(ComplianceEntityType entityType) {
-        log.info("Fetching ComplianceRecords by EntityType {}", entityType);
-
-        List<ComplianceRecord> records =
-                complianceRecordRepository.findByEntityType(entityType);
+        List<ComplianceRecord> records = complianceRecordRepository.findByEntityType(entityType);
 
         if (records.isEmpty()) {
-            log.warn("No ComplianceRecords found for EntityType {}", entityType);
-            throw new ResourceNotFoundException(
-                    "No records found for entity type: " + entityType);
+            throw new ResourceNotFoundException("No records found for entity type: " + entityType);
         }
 
         return records;
@@ -110,15 +89,10 @@ public class ComplianceRecordServiceImpl implements IComplianceRecordService {
 
     @Override
     public List<ComplianceRecord> findByComplianceResult(ComplianceResult complianceResult) {
-        log.info("Fetching ComplianceRecords by ComplianceResult {}", complianceResult);
-
-        List<ComplianceRecord> records =
-                complianceRecordRepository.findByComplianceResult(complianceResult);
+        List<ComplianceRecord> records = complianceRecordRepository.findByComplianceResult(complianceResult);
 
         if (records.isEmpty()) {
-            log.warn("No ComplianceRecords found for Result {}", complianceResult);
-            throw new ResourceNotFoundException(
-                    "No records found for result: " + complianceResult);
+            throw new ResourceNotFoundException("No records found for result: " + complianceResult);
         }
 
         return records;

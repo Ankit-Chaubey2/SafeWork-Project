@@ -8,7 +8,6 @@ import com.cts.SafeWork.exception.DocumentNotFoundException;
 import com.cts.SafeWork.exception.EmployeeNotFoundException;
 import com.cts.SafeWork.repository.EmployeeDocumentRepository;
 import com.cts.SafeWork.repository.EmployeeRepository;
-import lombok.extern.slf4j.Slf4j; // Import for Logging
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +27,11 @@ public class EmployeeDocumentServiceImpl implements IEmployeeDocumentService {
 
     @Override
     public DocumentResponseDTO uploadDocument(DocumentRequestDTO dto) {
-        log.info("Attempting to upload document for Employee ID: {}", dto.getEmployeeId());
-
-        // 1. Check if employee exists
+        // 1. look for employee if not then throw 404
         Employee employee = employeeRepository.findById(dto.getEmployeeId())
-                .orElseThrow(() -> {
-                    log.error("Document upload failed: Employee ID {} not found", dto.getEmployeeId());
-                    return new EmployeeNotFoundException(dto.getEmployeeId());
-                });
+                .orElseThrow(() -> new EmployeeNotFoundException("Employee not found with ID: " + dto.getEmployeeId()));
 
-        // 2. Mapping DTO to Entity
+        // 2. Mapping: DTO to Entity
         EmployeeDocument doc = new EmployeeDocument();
         doc.setEmployeeDocumentType(dto.getEmployeeDocumentType());
         doc.setEmployeeFileURL(dto.getEmployeeFileURL());
@@ -45,41 +39,28 @@ public class EmployeeDocumentServiceImpl implements IEmployeeDocumentService {
         doc.setVerificationStatus("PENDING");
         doc.setEmployee(employee);
 
-        // 3. Save
+        // 3. Save and return Response DTO
         EmployeeDocument savedDoc = documentRepository.save(doc);
-        log.info("Document of type {} uploaded successfully with ID: {}",
-                savedDoc.getEmployeeDocumentType(), savedDoc.getEmployeeDocumentID());
-
         return mapToDTO(savedDoc);
     }
 
     @Override
     public List<DocumentResponseDTO> getDocumentsByEmployee(long employeeId) {
-        log.info("Fetching all documents for Employee ID: {}", employeeId);
-
         List<EmployeeDocument> docs = documentRepository.findByEmployee_EmployeeId(employeeId);
         if (docs.isEmpty()) {
-            log.warn("No documents found in database for Employee ID: {}", employeeId);
             throw new DocumentNotFoundException("No documents found for Employee ID: " + employeeId);
         }
-
-        log.info("Successfully retrieved {} documents for Employee ID: {}", docs.size(), employeeId);
         return docs.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
     @Override
     public DocumentResponseDTO getDocumentById(Long docId) {
-        log.info("Fetching document details for Doc ID: {}", docId);
-
         EmployeeDocument doc = documentRepository.findById(docId)
-                .orElseThrow(() -> {
-                    log.warn("Fetch failed: Document ID {} not found", docId);
-                    return new DocumentNotFoundException("Document not found with ID: " + docId);
-                });
-
+                .orElseThrow(() -> new DocumentNotFoundException("Document not found with ID: " + docId));
         return mapToDTO(doc);
     }
 
+    // Helper: Entity -> DTO
     private DocumentResponseDTO mapToDTO(EmployeeDocument doc) {
         DocumentResponseDTO dto = new DocumentResponseDTO();
         dto.setEmployeeDocumentID(doc.getEmployeeDocumentID());
