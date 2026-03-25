@@ -9,6 +9,6 @@ import java.util.Optional;
 @Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
-    // Custom query to find employee by email for login functionality
+
     Optional<Employee> findByEmail(String email);
 }

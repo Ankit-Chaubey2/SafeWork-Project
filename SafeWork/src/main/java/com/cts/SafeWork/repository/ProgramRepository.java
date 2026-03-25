@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ProgramRepository extends JpaRepository<Program, Long> {
-    // additional query methods can be defined here if needed
+
 }

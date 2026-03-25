@@ -15,4 +15,5 @@ public class EmployeeResponseDTO {
     private String employeeContact;
     private String employeeDepartmentName;
     private EmployeeStatus employeeStatus;
+    private String token; // NEW: Added to return the JWT to the client
 }

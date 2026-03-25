@@ -37,4 +37,6 @@ public class User {
 
     @OneToMany(mappedBy = "officer", fetch = FetchType.LAZY)
     private List<Inspection> inspections;
+
+
 }

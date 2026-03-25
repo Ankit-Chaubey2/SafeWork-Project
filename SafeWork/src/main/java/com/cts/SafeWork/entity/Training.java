@@ -3,6 +3,7 @@
 
 package com.cts.SafeWork.entity;
 
+import com.cts.SafeWork.enums.TrainingStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;

@@ -55,20 +55,20 @@ public class EmployeeController {
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect old password!");
     }
+//
+//    @PostMapping("/logout/{id}")
+//    public ResponseEntity<String> logout(@PathVariable Long id) {
+//        log.info("REST request to logout employee ID: {}", id);
+//        return ResponseEntity.ok("Logout successful for Employee ID: " + id);
+//    }
 
-    @PostMapping("/logout/{id}")
-    public ResponseEntity<String> logout(@PathVariable Long id) {
-        log.info("REST request to logout employee ID: {}", id);
-        return ResponseEntity.ok("Logout successful for Employee ID: " + id);
-    }
-
-    @GetMapping("/employeestatus/{id}")
-    public ResponseEntity<Map<String, Object>> getEmployeeStats(@PathVariable Long id) {
-        log.info("REST request for stats of employee ID: {}", id);
-        EmployeeResponseDTO emp = employeeService.getEmployeeById(id);
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("accountStatus", emp.getEmployeeStatus());
-        stats.put("department", emp.getEmployeeDepartmentName());
-        return ResponseEntity.ok(stats);
-    }
+//    @GetMapping("/employeestatus/{id}")
+//    public ResponseEntity<Map<String, Object>> getEmployeeStats(@PathVariable Long id) {
+//        log.info("REST request for stats of employee ID: {}", id);
+//        EmployeeResponseDTO emp = employeeService.getEmployeeById(id);
+//        Map<String, Object> stats = new HashMap<>();
+//        stats.put("accountStatus", emp.getEmployeeStatus());
+//        stats.put("department", emp.getEmployeeDepartmentName());
+//        return ResponseEntity.ok(stats);
+//    }
 }

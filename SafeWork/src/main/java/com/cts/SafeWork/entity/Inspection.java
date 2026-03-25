@@ -1,5 +1,8 @@
 package com.cts.SafeWork.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +15,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Inspection {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,8 +28,10 @@ public class Inspection {
 
     @ManyToOne
     @JoinColumn(name = "officer_id", referencedColumnName = "userId")
+    @JsonBackReference
     private User officer;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "inspection")
     private List<ComplianceCheck> complianceChecks;
 }

@@ -6,13 +6,13 @@ import com.cts.SafeWork.dto.LoginRequestDTO;
 import java.util.Optional;
 
 public interface IEmployeeService {
-    // Registration will take DTO and will give ResponseDTO
+
     EmployeeResponseDTO registerEmployee(EmployeeRegistrationDTO registrationDTO);
 
-    // Login will take LoginRequestDTO from here
+
     EmployeeResponseDTO loginEmployee(LoginRequestDTO loginRequest);
 
-    // will get resonseDto by Id(No password)
+
     EmployeeResponseDTO getEmployeeById(Long id);
 
     EmployeeResponseDTO updateEmployee(Long id, EmployeeRegistrationDTO details);

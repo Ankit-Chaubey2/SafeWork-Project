@@ -11,8 +11,10 @@ import com.cts.SafeWork.exception.InvalidEmployeeException;
 import com.cts.SafeWork.projection.HazardReportProjection;
 import com.cts.SafeWork.repository.EmployeeRepository;
 import com.cts.SafeWork.repository.HazardRepository;
-import lombok.extern.slf4j.Slf4j; // SLF4J Import
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,11 @@ public class HazardServiceImpl implements IHazardService {
         this.employeeRepository = employeeRepository;
     }
 
+
+    private String getLoggedInUserEmail() {
+        return SecurityContextHolder.getContext().getAuthentication().getName();
+    }
+
     @Override
     public List<HazardReportProjection> getAllHazards() {
         log.info("Fetching all hazard report projections.");
@@ -40,62 +47,53 @@ public class HazardServiceImpl implements IHazardService {
 
     @Override
     public Hazard getHazardById(Long hazardId) {
-        log.info("Searching for hazard with ID: {}", hazardId);
-        return hazardRepository.findById(hazardId)
-                .orElseThrow(() -> {
-                    log.error("Hazard retrieval failed: ID {} not found", hazardId);
-                    return new HazardNotFoundException(hazardId);
-                });
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = auth.getName();
+
+        // Check if the user is a Hazard Officer or Admin
+        boolean isOfficerOrAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("HAZARD_OFFICER") || a.getAuthority().equals("ADMIN"));
+
+        Hazard hazard = hazardRepository.findById(hazardId)
+                .orElseThrow(() -> new HazardNotFoundException(hazardId));
+
+        // SECURITY CHECK: Allow if it's the owner OR if it's an Officer/Admin
+        if (!isOfficerOrAdmin && !hazard.getEmployee().getEmail().equalsIgnoreCase(currentUserEmail)) {
+            log.error("Unauthorized Access: {} tried to view Hazard ID {}", currentUserEmail, hazardId);
+            throw new InvalidEmployeeException("Access Denied: You do not have permission to view this report.");
+        }
+
+        return hazard;
     }
 
     @Override
     @Transactional
     public HazardRequestDto addHazard(Long employeeID, HazardRequestDto hazardRequestDto) {
-        log.info("Reporting new hazard for Employee ID: {}", employeeID);
+        String currentUserEmail = getLoggedInUserEmail();
+        log.info("User {} reporting hazard. Checking URL ID: {}", currentUserEmail, employeeID);
 
-        // 1) Ensure employee exists
-        Employee employee = employeeRepository.findById(employeeID)
-                .orElseThrow(() -> {
-                    log.error("Failed to add hazard: Employee ID {} not found", employeeID);
-                    return new EmployeeNotFoundException(employeeID);
-                });
 
-        // 2) Map DTO -> Entity
+        Employee employee = employeeRepository.findByEmail(currentUserEmail)
+                .orElseThrow(() -> new EmployeeNotFoundException("Authenticated employee not found."));
+
+
+        if (!Objects.equals(employee.getEmployeeId(), employeeID)) {
+            log.warn("Impersonation Attempt! Token: {}, URL ID: {}", currentUserEmail, employeeID);
+            throw new InvalidEmployeeException("Security Violation: You can only report hazards for your own Employee ID.");
+        }
+
         Hazard hazard = new Hazard();
         hazard.setHazardDate(hazardRequestDto.getHazardDate());
         hazard.setHazardDescription(hazardRequestDto.getHazardDescription());
         hazard.setHazardStatus(HazardStatus.PENDING);
         hazard.setHazardLocation(hazardRequestDto.getHazardLocation());
-        hazard.setEmployee(employee);
+        hazard.setEmployee(employee); // Crucial: Link to the employee from the TOKEN
 
-        // 3) Persist
-        Hazard savedHazard = hazardRepository.save(hazard);
-        log.info("New hazard successfully recorded with status PENDING at location: {}", hazard.getHazardLocation());
+        hazardRepository.save(hazard);
+        log.info("Hazard successfully recorded for: {}", currentUserEmail);
 
         hazardRequestDto.setHazardStatus(HazardStatus.PENDING);
         return hazardRequestDto;
-    }
-
-    @Override
-    @Transactional
-    public String deleteHazard(Long hazardId) {
-        log.info("Request received to delete Hazard ID: {}", hazardId);
-
-        Hazard hazard = hazardRepository.findById(hazardId)
-                .orElseThrow(() -> {
-                    log.error("Deletion failed: Hazard ID {} not found", hazardId);
-                    return new HazardNotFoundException(hazardId);
-                });
-
-        // Business Rule Validation
-        if (hazard.getHazardStatus() != HazardStatus.PENDING) {
-            log.warn("Unauthorized deletion attempt: Hazard ID {} is already COMPLETED/REPORTED.", hazardId);
-            throw new IncidentAlreadyReportedException("Hazard cannot be deleted because Incident has already been Reported");
-        }
-
-        hazardRepository.delete(hazard);
-        log.info("Hazard ID: {} deleted successfully from the system.", hazardId);
-        return "Hazard deleted successfully!";
     }
 
     @Override
@@ -138,5 +136,35 @@ public class HazardServiceImpl implements IHazardService {
         log.info("SUCCESS: Hazard ID {} successfully updated by Employee ID {}", hazardId, employeeId);
 
         return hazardRequestDto;
+    }
+
+    @Override
+    @Transactional
+    public String deleteHazard(Long hazardId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String currentUserEmail = auth.getName();
+
+        // 1. Check for Privileged Roles (Admin or Hazard Officer)
+        boolean isPrivileged = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("HAZARD_OFFICER") || a.getAuthority().equals("ADMIN"));
+
+        // 2. Fetch the Hazard
+        Hazard hazard = hazardRepository.findById(hazardId)
+                .orElseThrow(() -> new HazardNotFoundException(hazardId));
+
+        // 3. SECURITY CHECK: Allow if user is Privileged OR if user is the Owner
+        if (!isPrivileged && !hazard.getEmployee().getEmail().equalsIgnoreCase(currentUserEmail)) {
+            log.error("Delete Denied: User {} is not authorized to delete Hazard {}", currentUserEmail, hazardId);
+            throw new InvalidEmployeeException("Access Denied: You cannot delete this report.");
+        }
+
+        // 4. Business Rule: Prevent deletion if already processed (Optional for Officers)
+        if (!isPrivileged && hazard.getHazardStatus() != HazardStatus.PENDING) {
+            throw new IncidentAlreadyReportedException("Hazard cannot be deleted as it is already processed.");
+        }
+
+        hazardRepository.delete(hazard);
+        log.info("Hazard ID {} deleted by {}", hazardId, currentUserEmail);
+        return "Hazard deleted successfully!";
     }
 }

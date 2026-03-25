@@ -1,4 +1,4 @@
-package com.cts.SafeWork.entity;
+package com.cts.SafeWork.enums;
 
 public enum TrainingStatus {
     NOT_STARTED,

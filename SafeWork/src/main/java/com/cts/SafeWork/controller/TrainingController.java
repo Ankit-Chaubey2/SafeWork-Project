@@ -88,11 +88,11 @@ public class TrainingController {
 
         log.info("REST request to link Program ID: {} with Employee ID: {}", programId, employeeId);
 
-        // 1. Fetch Program
+
 
         Program program = programService.getProgramById(programId);
 
-        // 2. Fetch Employee DTO (Using your new Service method)
+
 
         EmployeeResponseDTO employeeDTO = employeeService.getEmployeeById(employeeId);
 
@@ -106,15 +106,7 @@ public class TrainingController {
 
         }
 
-        /* NOTE: Since your Training entity needs the Employee entity object,
 
-           ensure your service handles the mapping or add a method in IEmployeeService
-
-           to get the actual Entity if needed.
-
-           Assuming 'training.setEmployee()' needs the entity:
-
-        */
 
         Employee employee = new Employee();
 

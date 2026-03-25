@@ -4,5 +4,6 @@ public enum UserRole {
     ADMIN,
     COMPLIANCE_OFFICER,
     SAFETY_OFFICER,
-    EMPLOYEE
+    HAZARD_OFFICER,
+
 }
