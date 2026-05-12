@@ -1,0 +1,241 @@
+<div class="register-page">
+
+  <!-- Background decorations -->
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+  <svg class="bg-grid" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
+    <defs>
+      <pattern id="rg" width="44" height="44" patternUnits="userSpaceOnUse">
+        <path d="M 44 0 L 0 0 0 44" fill="none" stroke="rgba(26,60,94,0.045)" stroke-width="1" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#rg)" />
+  </svg>
+
+  <div class="register-wrap">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <a routerLink="/login" class="back-link">
+        <span class="back-arrow">←</span>
+        <span>Back to Login</span>
+      </a>
+      <div class="topbar-brand">
+        <div class="brand-logo">
+          <span>SW</span>
+          <div class="logo-shine"></div>
+        </div>
+        <span class="brand-name">SafeWork</span>
+      </div>
+    </div>
+
+    <div class="card">
+
+      <!-- Card header -->
+      <div class="card-header">
+        <div class="header-left">
+          <div class="header-icon">👤</div>
+          <div>
+            <h2>Employee Registration</h2>
+            <p>Complete the form below to request system access.</p>
+          </div>
+        </div>
+        <div class="step-indicator">
+          <div class="step-dot active"></div>
+          <div class="step-line"></div>
+          <div class="step-dot"></div>
+        </div>
+      </div>
+
+      <!-- Alerts -->
+      <div *ngIf="success()" class="alert alert-success">
+        <span>{{ success() }}</span>
+      </div>
+      <div *ngIf="error()" class="alert alert-danger">
+        <span class="alert-icon">⚠</span>
+        <span>{{ error() }}</span>
+      </div>
+
+      <form (ngSubmit)="submit()" class="content-grid">
+
+        <!-- SECTION 1 -->
+        <section class="form-section">
+          <div class="section-header">
+            <div class="section-num">01</div>
+            <div>
+              <h3>Personal Information</h3>
+              <span class="section-sub">Your basic identity details</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="form-label">
+              <span class=""></span>Full Name
+            </label>
+            <div class="input-wrap">
+              <input class="form-control has-prefix" [(ngModel)]="form.userName" name="userName" required placeholder="John Doe" />
+              <div class="focus-bar"></div>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group">
+              <label class="form-label">
+                <span class=""></span>Date of Birth
+              </label>
+              <div class="input-wrap">
+                <input type="date" class="form-control has-prefix" [(ngModel)]="form.employeeDOB" name="employeeDOB" required />
+                <div class="focus-bar"></div>
+              </div>
+            </div>
+            <div class="field-group">
+              <label class="form-label">
+                <span class=""></span>Gender
+              </label>
+              <div class="input-wrap">
+                <span class="input-prefix-icon">⚧</span>
+                <select class="form-control has-prefix" [(ngModel)]="form.employeeGender" name="employeeGender" required>
+                  <option value="" disabled>Select...</option>
+                  <option *ngFor="let g of genders" [value]="g">{{ g }}</option>
+                </select>
+                <div class="focus-bar"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="form-label">
+              <span class=""></span>Email Address
+            </label>
+            <div class="input-wrap">
+              <span class="input-prefix-icon">✉</span>
+              <input type="email" class="form-control has-prefix" [(ngModel)]="form.userEmail" name="userEmail" required placeholder="john@company.com" />
+              <div class="focus-bar"></div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="form-label">
+              <span class=""></span>Contact Phone
+            </label>
+            <div class="input-wrap">
+              <span class="input-prefix-icon">📞</span>
+              <input class="form-control has-prefix" [(ngModel)]="form.userContact" name="userContact" required placeholder="+91 00000 00000" />
+              <div class="focus-bar"></div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="form-label">
+              <span class=""></span>Password
+            </label>
+            <div class="input-wrap">
+              <input type="password" class="form-control has-prefix" [(ngModel)]="form.password" name="password" required minlength="6" placeholder="Min. 6 characters" />
+              <div class="focus-bar"></div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="form-label">
+              <span class=""></span>Home Address
+            </label>
+            <div class="input-wrap">
+              <textarea class="form-control" [(ngModel)]="form.employeeAddress" name="employeeAddress" rows="3" required placeholder="Street, City, State, PIN"></textarea>
+              <div class="focus-bar"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2 -->
+        <section class="form-section">
+          <div class="section-header">
+            <div class="section-num">02</div>
+            <div>
+              <h3>Work Information</h3>
+              <span class="section-sub">Your role &amp; documents</span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="form-label">
+              <span class=""></span>Department
+            </label>
+            <div class="input-wrap">
+              <select class="form-control has-prefix" [(ngModel)]="form.employeeDepartmentName" name="employeeDepartmentName" required>
+                <option value="" disabled>Select Department...</option>
+                <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+              </select>
+              <div class="focus-bar"></div>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label class="form-label">
+              <span class=""></span>Document Type
+            </label>
+            <div class="input-wrap">
+              <select class="form-control has-prefix" [(ngModel)]="form.employeeDocumentType" name="employeeDocumentType" required>
+                <option value="" disabled>Select document type...</option>
+                <option value="ID_PROOF">ID Proof</option>
+                <option value="TRAINING_CERTIFICATE">Training Certificate</option>
+              </select>
+              <div class="focus-bar"></div>
+            </div>
+          </div>
+
+          <!-- File upload zone -->
+          <div class="field-group">
+            <label class="form-label">
+              <span class=""></span>Document Upload
+            </label>
+            <div class="upload-zone" [class.has-file]="selectedFile">
+              <input type="file" class="upload-input" (change)="onFileSelected($event)" required />
+              <div class="upload-content">
+                <div class="upload-icon">{{ selectedFile ? '✅' : '' }}</div>
+                <div class="upload-text">
+                  <strong>{{ selectedFile ? selectedFile.name : 'Click or drag file here' }}</strong>
+                  <span>{{ selectedFile ? 'File selected — ready to upload' : 'PDF, JPG, PNG up to 10MB' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dept cards -->
+          <div class="dept-grid">
+            <div
+              class="dept-card"
+              *ngFor="let dept of departments"
+              [class.selected]="form.employeeDepartmentName === dept"
+              (click)="form.employeeDepartmentName = dept"
+            >
+              <span class="dept-dot"></span>
+              <span>{{ dept }}</span>
+            </div>
+          </div>
+
+          <!-- Pending note -->
+          <div class="pending-note">
+            <div>
+              <strong>Initial Status: Pending Approval</strong><br />
+              <span style="color:red">You can login only after admin activates your account.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Actions -->
+        <div class="actions">
+          <button type="button" class="btn btn-outline" (click)="router.navigate(['/login'])">
+            <span>✕</span> Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="loading()">
+            <span class="btn-spinner" *ngIf="loading()"></span>
+            <span>{{ loading() ? 'Submitting...' : 'Submit Registration' }}</span>
+            <span *ngIf="!loading()">→</span>
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+</div>
